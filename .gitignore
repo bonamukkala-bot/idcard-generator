@@ -5,3 +5,5 @@ uploads/
 *.iml
 .vscode/
 HELP.md
+
+.kilo/

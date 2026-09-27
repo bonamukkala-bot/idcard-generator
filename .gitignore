@@ -1,0 +1,7 @@
+target/
+uploads/
+*.class
+.idea/
+*.iml
+.vscode/
+HELP.md

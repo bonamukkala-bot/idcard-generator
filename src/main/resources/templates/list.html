@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registered Students - College ID Card Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Global Shared Navigation Header -->
+<header class="app-header">
+    <a th:href="@{/students}" class="brand-badge">
+        <div class="brand-icon">ID</div>
+        <div>
+            <div class="brand-title">College ID Portal</div>
+            <div class="brand-subtitle">Smart Student Identity Generation System</div>
+        </div>
+    </a>
+    <div class="nav-actions">
+        <a th:href="@{/students/new}" class="btn-nav-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Register New Student
+        </a>
+    </div>
+</header>
+
+<!-- Main Directory Content -->
+<main class="directory-container">
+    
+    <!-- Directory Toolbar & Search -->
+    <div class="directory-toolbar">
+        <div class="directory-header-info">
+            <h1>Student Directory</h1>
+            <div class="directory-stats-badge">
+                <span class="count-pill" id="studentCount" th:text="${#lists.size(students)}">0</span>
+                <span>Active student ID records issued</span>
+            </div>
+        </div>
+
+        <!-- Real-time Search Box -->
+        <div class="directory-search-box" th:unless="${#lists.isEmpty(students)}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-light);">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" class="directory-search-input" placeholder="Search by name, roll no, dept..."/>
+        </div>
+    </div>
+
+    <!-- Empty State (When no students exist) -->
+    <div class="empty-state-card" th:if="${#lists.isEmpty(students)}">
+        <div class="empty-state-illustration">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        </div>
+        <h2 class="empty-state-title">No Students Registered Yet</h2>
+        <p class="empty-state-desc">
+            No institutional identity cards have been generated yet. Register your first student to create high-resolution ID cards with QR verification.
+        </p>
+        <a th:href="@{/students/new}" class="btn-nav-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Register First Student
+        </a>
+    </div>
+
+    <!-- Responsive Student Card Grid (When students exist) -->
+    <div class="student-grid" id="studentGrid" th:unless="${#lists.isEmpty(students)}">
+        <div class="student-card" th:each="s : ${students}" th:attr="data-dept=${s.department}, data-name=${s.fullName}, data-roll=${s.rollNumber}">
+            <!-- Top Department Accent Bar -->
+            <div class="student-card-accent-bar"></div>
+
+            <div class="student-card-body">
+                <!-- Header: Avatar + Name + Roll -->
+                <div class="student-card-header">
+                    <div class="student-avatar" th:text="${#strings.length(s.fullName) > 0 ? #strings.substring(s.fullName, 0, 1).toUpperCase() : 'S'}">
+                        S
+                    </div>
+                    <div class="student-identity">
+                        <div class="student-card-name" th:text="${s.fullName}">Alex Rivera</div>
+                        <div class="student-card-roll">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                <line x1="7" y1="8" x2="11" y2="8"></line>
+                                <line x1="7" y1="12" x2="17" y2="12"></line>
+                            </svg>
+                            <span th:text="${s.rollNumber}">2024-CS-0418</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Department Chip -->
+                <div class="dept-chip" th:text="${s.department != null and !#strings.isEmpty(s.department) ? s.department : 'General'}">
+                    Computer Science
+                </div>
+
+                <!-- Metadata Grid: Course & Valid Till -->
+                <div class="student-card-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Course / Program</span>
+                        <span class="meta-val" th:text="${s.course != null and !#strings.isEmpty(s.course) ? s.course : '-'}">B.Tech</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Valid Till</span>
+                        <span class="meta-val" th:text="${s.validTill != null and !#strings.isEmpty(s.validTill) ? s.validTill : '-'}">2028</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons: PDF & Image Downloads -->
+                <div class="student-card-actions">
+                    <a th:href="@{'/students/' + ${s.id} + '/card.pdf'}" class="btn-card-action btn-card-pdf" title="Download Print-Ready PDF">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        PDF Card
+                    </a>
+                    <a th:href="@{'/students/' + ${s.id} + '/card.png'}" class="btn-card-action btn-card-png" title="Download High-Res PNG Image">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        PNG Image
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Vanilla JS for Department Styling and Real-Time Search Filtering -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Dynamic Department Accent Color Assignment
+    const cards = document.querySelectorAll('.student-card');
+
+    function getDeptColor(dept) {
+        if (!dept || !dept.trim()) return { color: '#2563eb', chipClass: 'dept-chip-default' };
+        const d = dept.trim().toUpperCase();
+        if (d.includes('CS') || d.includes('COMP') || d.includes('IT') || d.includes('INFO') || d.includes('AI') || d.includes('DATA')) {
+            return { color: '#2563eb', chipClass: 'dept-chip-cs' };
+        } else if (d.includes('EC') || d.includes('EE') || d.includes('ELECT') || d.includes('COMM')) {
+            return { color: '#7c3aed', chipClass: 'dept-chip-ece' };
+        } else if (d.includes('MECH') || d.includes('AUTO') || d.includes('AERO') || d.includes('MANUF')) {
+            return { color: '#ea580c', chipClass: 'dept-chip-mech' };
+        } else if (d.includes('CIVIL') || d.includes('BIO') || d.includes('CHEM') || d.includes('ENV')) {
+            return { color: '#0d9488', chipClass: 'dept-chip-civil' };
+        } else if (d.includes('BUS') || d.includes('MBA') || d.includes('MGMT') || d.includes('COMMERCE') || d.includes('FIN')) {
+            return { color: '#d97706', chipClass: 'dept-chip-mgmt' };
+        }
+        return { color: '#2563eb', chipClass: 'dept-chip-default' };
+    }
+
+    cards.forEach(card => {
+        const dept = card.getAttribute('data-dept');
+        const { color, chipClass } = getDeptColor(dept);
+        
+        // Set CSS custom property for this card's accent
+        card.style.setProperty('--dept-color', color);
+        
+        // Style the chip
+        const chip = card.querySelector('.dept-chip');
+        if (chip) {
+            chip.classList.add(chipClass);
+        }
+    });
+
+    // Real-Time Search Filtering
+    const searchInput = document.getElementById('searchInput');
+    const studentCount = document.getElementById('studentCount');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const roll = (card.getAttribute('data-roll') || '').toLowerCase();
+                const dept = (card.getAttribute('data-dept') || '').toLowerCase();
+                
+                const matches = name.includes(query) || roll.includes(query) || dept.includes(query);
+                if (matches) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (studentCount) {
+                studentCount.textContent = visibleCount;
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>

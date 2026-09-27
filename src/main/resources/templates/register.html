@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Student - College ID Card Generator</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Global App Header -->
+<header class="app-header">
+    <a th:href="@{/students}" class="brand-badge">
+        <div class="brand-icon">ID</div>
+        <div>
+            <div class="brand-title">College ID Portal</div>
+            <div class="brand-subtitle">Smart Student Identity Generation System</div>
+        </div>
+    </a>
+    <div class="nav-actions">
+        <a th:href="@{/students}" class="btn-nav-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            View Registered Students
+        </a>
+    </div>
+</header>
+
+<!-- Two-Panel Main Container -->
+<main class="app-layout">
+    
+    <!-- LEFT PANEL: Student Registration Form -->
+    <section class="form-panel">
+        <div class="form-panel-header">
+            <h1 class="form-panel-title">Student Registration</h1>
+            <p class="form-panel-desc">Fill in student details below. Watch the institutional ID card render in real time.</p>
+            
+            <!-- Live Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-header">
+                    <span>Application Progress</span>
+                    <span id="progressText">0 of 4 required fields filled</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+            </div>
+        </div>
+
+        <form id="studentForm" th:action="@{/students}" th:object="${student}" method="post"
+              enctype="multipart/form-data" novalidate>
+
+            <!-- SECTION 1: Personal Information -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <span class="section-title">Personal Information</span>
+                </div>
+
+                <div class="fields-grid single-col">
+                    <div class="form-field" id="field-fullName">
+                        <input type="text" th:field="*{fullName}" id="fullNameInput" class="floating-input"
+                               placeholder=" " required autocomplete="off"/>
+                        <label for="fullNameInput" class="floating-label">Full Name *</label>
+                        <span class="field-validation-icon">✓</span>
+                        <div class="field-hint">Enter first and last name as per official records</div>
+                    </div>
+                </div>
+
+                <div class="fields-grid" style="margin-top: 16px;">
+                    <div class="form-field" id="field-dateOfBirth">
+                        <input type="date" th:field="*{dateOfBirth}" id="dobInput" class="floating-input"
+                               placeholder=" "/>
+                        <label for="dobInput" class="floating-label">Date of Birth</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Academic Information -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                        </svg>
+                    </div>
+                    <span class="section-title">Academic Details</span>
+                </div>
+
+                <div class="fields-grid">
+                    <div class="form-field" id="field-rollNumber">
+                        <input type="text" th:field="*{rollNumber}" id="rollNumberInput" class="floating-input"
+                               placeholder=" " required autocomplete="off"/>
+                        <label for="rollNumberInput" class="floating-label">Roll Number *</label>
+                        <span class="field-validation-icon" id="rollValidationIcon">✓</span>
+                        <div class="field-hint" id="rollHint">e.g. 2024-CS-0418 or ME-1024</div>
+                    </div>
+
+                    <div class="form-field" id="field-department">
+                        <input type="text" th:field="*{department}" id="deptInput" class="floating-input"
+                               placeholder=" " list="deptList" autocomplete="off"/>
+                        <label for="deptInput" class="floating-label">Department</label>
+                        <datalist id="deptList">
+                            <option value="Computer Science & Engineering">
+                            <option value="Electronics & Communication">
+                            <option value="Mechanical Engineering">
+                            <option value="Civil Engineering">
+                            <option value="Information Technology">
+                            <option value="Biotechnology">
+                            <option value="Business Administration (MBA)">
+                        </datalist>
+                        <div class="field-hint">Determines card accent color</div>
+                    </div>
+
+                    <div class="form-field" id="field-course">
+                        <input type="text" th:field="*{course}" id="courseInput" class="floating-input"
+                               placeholder=" " autocomplete="off"/>
+                        <label for="courseInput" class="floating-label">Course / Program</label>
+                        <div class="field-hint">e.g. B.Tech, M.Tech, MCA</div>
+                    </div>
+
+                    <div class="form-field" id="field-validTill">
+                        <input type="date" th:field="*{validTill}" id="validTillInput" class="floating-input"
+                               placeholder=" "/>
+                        <label for="validTillInput" class="floating-label">Valid Till</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Student Photograph -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </div>
+                    <span class="section-title">Student Photograph *</span>
+                </div>
+
+                <div class="form-field" id="field-photo">
+                    <input type="file" id="photoInput" name="photo" accept="image/*" class="dropzone-file-input" required/>
+                    
+                    <div class="dropzone" id="photoDropzone">
+                        <div class="dropzone-content" id="dropzoneContent">
+                            <div class="dropzone-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div class="dropzone-title">Drag photo here or click to browse</div>
+                            <div class="dropzone-desc">JPG, PNG or WEBP (Passport format recommended)</div>
+                        </div>
+
+                        <div class="dropzone-preview" id="dropzonePreview">
+                            <img id="dropzoneThumb" src="" alt="Thumbnail" class="dropzone-thumb-img"/>
+                            <span class="dropzone-change-btn">Change Selected Photo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span class="spinner"></span>
+                <span class="btn-text">Register Student & Generate ID</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+        </form>
+    </section>
+
+    <!-- RIGHT PANEL: Interactive Live ID Card Preview -->
+    <aside class="preview-panel">
+        <div class="preview-badge-header">
+            <div class="preview-badge-title">
+                <span class="live-indicator-dot"></span>
+                Live Card Preview
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Real-Time Java2D Sync</span>
+        </div>
+
+        <!-- Realistic ID Card Mockup -->
+        <div class="id-card-mockup" id="liveCard">
+            <!-- Left Dynamic Accent Stripe -->
+            <div class="card-left-accent" id="cardLeftAccent"></div>
+
+            <!-- Card Header Banner -->
+            <div class="card-header-banner">
+                <div class="card-header-top">
+                    <div class="card-monogram">ID</div>
+                    <div class="card-header-text">
+                        <div class="card-header-sub">INSTITUTE OF TECHNOLOGY</div>
+                        <div class="card-header-main">COLLEGE ID CARD</div>
+                    </div>
+                    <div class="card-header-badge">★ STUDENT</div>
+                </div>
+                <!-- Header bottom accent bar -->
+                <div class="card-header-accent-line" id="cardHeaderAccent"></div>
+            </div>
+
+            <!-- Floating Photo Box -->
+            <div class="card-photo-wrapper">
+                <div class="card-photo-frame">
+                    <img id="cardPhotoPreview" src="" alt="Student Photo" class="card-photo-img"/>
+                    <div id="cardPhotoSilhouette" class="card-photo-silhouette">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="8" r="4"></circle>
+                            <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+                        </svg>
+                        <span style="font-size: 10px; font-weight: 700; margin-top: -4px;">PHOTO</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Body Content -->
+            <div class="card-body-content">
+                <div class="card-watermark"></div>
+                
+                <div class="card-student-name" id="cardNamePreview">Student Full Name</div>
+                <div class="card-divider-line" id="cardDivider"></div>
+
+                <div class="card-fields-grid">
+                    <!-- Roll Number -->
+                    <div class="card-field-item">
+                        <div class="card-field-icon">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                <line x1="7" y1="8" x2="11" y2="8"></line>
+                                <line x1="7" y1="12" x2="17" y2="12"></line>
+                                <line x1="7" y1="16" x2="13" y2="16"></line>
+                            </svg>
+                        </div>
+                        <div class="card-field-data">
+                            <span class="card-field-label">Roll Number</span>
+                            <span class="card-field-val" id="cardRollPreview">2024-CS-0000</span>
+                        </div>
+                    </div>
+
+                    <!-- Department -->
+                    <div class="card-field-item">
+                        <div class="card-field-icon">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4"></path>
+                            </svg>
+                        </div>
+                        <div class="card-field-data">
+                            <span class="card-field-label">Department</span>
+                            <span class="card-field-val" id="cardDeptPreview">General Engineering</span>
+                        </div>
+                    </div>
+
+                    <!-- Course -->
+                    <div class="card-field-item">
+                        <div class="card-field-icon">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                            </svg>
+                        </div>
+                        <div class="card-field-data">
+                            <span class="card-field-label">Course / Program</span>
+                            <span class="card-field-val" id="cardCoursePreview">Undergraduate</span>
+                        </div>
+                    </div>
+
+                    <!-- Valid Till -->
+                    <div class="card-field-item">
+                        <div class="card-field-icon">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="card-field-data">
+                            <span class="card-field-label">Valid Till</span>
+                            <span class="card-field-val" id="cardValidPreview">2028-06-30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Footer Security Band -->
+            <div class="card-footer-band">
+                <div class="card-qr-frame">
+                    <!-- Vector QR Code representation -->
+                    <svg class="card-qr-svg" viewBox="0 0 100 100" fill="#141e3c">
+                        <rect x="5" y="5" width="26" height="26" fill="#141e3c"/>
+                        <rect x="9" y="9" width="18" height="18" fill="#ffffff"/>
+                        <rect x="13" y="13" width="10" height="10" fill="#141e3c"/>
+                        
+                        <rect x="69" y="5" width="26" height="26" fill="#141e3c"/>
+                        <rect x="73" y="9" width="18" height="18" fill="#ffffff"/>
+                        <rect x="77" y="13" width="10" height="10" fill="#141e3c"/>
+                        
+                        <rect x="5" y="69" width="26" height="26" fill="#141e3c"/>
+                        <rect x="9" y="73" width="18" height="18" fill="#ffffff"/>
+                        <rect x="13" y="77" width="10" height="10" fill="#141e3c"/>
+                        
+                        <rect x="38" y="10" width="8" height="8"/>
+                        <rect x="50" y="18" width="10" height="10"/>
+                        <rect x="38" y="38" width="24" height="24"/>
+                        <rect x="68" y="45" width="10" height="10"/>
+                        <rect x="42" y="72" width="12" height="12"/>
+                        <rect x="68" y="75" width="18" height="8"/>
+                    </svg>
+                </div>
+                <div class="card-footer-info">
+                    <div class="card-verify-badge">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        SCAN TO VERIFY
+                    </div>
+                    <div class="card-footer-desc">Official encrypted identity credential.</div>
+                    <div class="card-sig-line">Authorized Registrar</div>
+                </div>
+            </div>
+
+            <!-- Bottom Security Stripe Motif -->
+            <div class="card-bottom-stripe">
+                <div class="stripe-gold"></div>
+                <div class="stripe-dept" id="cardStripeDept"></div>
+                <div class="stripe-navy"></div>
+            </div>
+        </div>
+    </aside>
+</main>
+
+<!-- Vanilla JavaScript for Live Sync, Real-time Validation, Dropzone & Micro-Interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Form Inputs
+    const fullNameInput = document.getElementById('fullNameInput');
+    const rollNumberInput = document.getElementById('rollNumberInput');
+    const deptInput = document.getElementById('deptInput');
+    const courseInput = document.getElementById('courseInput');
+    const validTillInput = document.getElementById('validTillInput');
+    const photoInput = document.getElementById('photoInput');
+    const photoDropzone = document.getElementById('photoDropzone');
+    const dropzoneContent = document.getElementById('dropzoneContent');
+    const dropzonePreview = document.getElementById('dropzonePreview');
+    const dropzoneThumb = document.getElementById('dropzoneThumb');
+    const studentForm = document.getElementById('studentForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Live Card Preview Elements
+    const cardNamePreview = document.getElementById('cardNamePreview');
+    const cardRollPreview = document.getElementById('cardRollPreview');
+    const cardDeptPreview = document.getElementById('cardDeptPreview');
+    const cardCoursePreview = document.getElementById('cardCoursePreview');
+    const cardValidPreview = document.getElementById('cardValidPreview');
+    const cardPhotoPreview = document.getElementById('cardPhotoPreview');
+    const cardPhotoSilhouette = document.getElementById('cardPhotoSilhouette');
+    const cardLeftAccent = document.getElementById('cardLeftAccent');
+    const cardHeaderAccent = document.getElementById('cardHeaderAccent');
+    const cardStripeDept = document.getElementById('cardStripeDept');
+
+    // Progress Elements
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+
+    // Department Accent Colors mapping matching CardLayoutRenderer.java
+    function getDepartmentColor(dept) {
+        if (!dept || !dept.trim()) return '#2563eb';
+        const d = dept.trim().toUpperCase();
+        if (d.includes('CS') || d.includes('COMP') || d.includes('IT') || d.includes('INFO') || d.includes('AI') || d.includes('DATA')) {
+            return '#2563eb'; // Royal Blue
+        } else if (d.includes('EC') || d.includes('EE') || d.includes('ELECT') || d.includes('COMM')) {
+            return '#7c3aed'; // Purple
+        } else if (d.includes('MECH') || d.includes('AUTO') || d.includes('AERO') || d.includes('MANUF')) {
+            return '#ea580c'; // Orange
+        } else if (d.includes('CIVIL') || d.includes('BIO') || d.includes('CHEM') || d.includes('ENV')) {
+            return '#0d9488'; // Teal
+        } else if (d.includes('BUS') || d.includes('MBA') || d.includes('MGMT') || d.includes('COMMERCE') || d.includes('FIN')) {
+            return '#d97706'; // Amber Gold
+        }
+        return '#2563eb';
+    }
+
+    function updateDepartmentColor() {
+        const color = getDepartmentColor(deptInput.value);
+        document.documentElement.style.setProperty('--accent-current', color);
+        if (cardLeftAccent) cardLeftAccent.style.backgroundColor = color;
+        if (cardHeaderAccent) cardHeaderAccent.style.backgroundColor = color;
+        if (cardStripeDept) cardStripeDept.style.backgroundColor = color;
+    }
+
+    // Live update functions
+    function updateLivePreview() {
+        // Name
+        cardNamePreview.textContent = fullNameInput.value.trim() || 'Student Full Name';
+        
+        // Roll No
+        cardRollPreview.textContent = rollNumberInput.value.trim() || '2024-CS-0000';
+        
+        // Department
+        cardDeptPreview.textContent = deptInput.value.trim() || 'General Engineering';
+        updateDepartmentColor();
+        
+        // Course
+        cardCoursePreview.textContent = courseInput.value.trim() || 'Undergraduate';
+        
+        // Valid Till
+        cardValidPreview.textContent = validTillInput.value || '2028-06-30';
+
+        // Floating label state helper
+        [fullNameInput, rollNumberInput, deptInput, courseInput, validTillInput].forEach(input => {
+            if (input && input.value) {
+                input.classList.add('has-value');
+            } else if (input) {
+                input.classList.remove('has-value');
+            }
+        });
+
+        // Inline validation check
+        validateRollNumber();
+        updateProgress();
+    }
+
+    // Real-time roll number validation
+    function validateRollNumber() {
+        const val = rollNumberInput.value.trim();
+        const fieldWrap = document.getElementById('field-rollNumber');
+        const icon = document.getElementById('rollValidationIcon');
+        const hint = document.getElementById('rollHint');
+
+        if (!val) {
+            fieldWrap.classList.remove('is-valid', 'has-error');
+            icon.textContent = '';
+            hint.textContent = 'e.g. 2024-CS-0418 or ME-1024';
+            hint.style.color = 'var(--text-muted)';
+            return false;
+        }
+
+        // Check if length is at least 4 characters and has alphanumeric/hyphens
+        const isValid = /^[A-Za-z0-9\-\/]{3,20}$/.test(val);
+        if (isValid) {
+            fieldWrap.classList.remove('has-error');
+            fieldWrap.classList.add('is-valid');
+            icon.textContent = '✓';
+            hint.textContent = 'Valid roll number format';
+            hint.style.color = 'var(--success-green)';
+            return true;
+        } else {
+            fieldWrap.classList.remove('is-valid');
+            fieldWrap.classList.add('has-error');
+            icon.textContent = '✕';
+            hint.textContent = 'Format should contain 3-20 letters/numbers';
+            hint.style.color = 'var(--error-red)';
+            return false;
+        }
+    }
+
+    // Update Progress Indicator
+    function updateProgress() {
+        let filledCount = 0;
+        const requiredInputs = [
+            fullNameInput.value.trim().length > 0,
+            rollNumberInput.value.trim().length > 0,
+            deptInput.value.trim().length > 0,
+            photoInput.files && photoInput.files.length > 0
+        ];
+
+        filledCount = requiredInputs.filter(Boolean).length;
+        const total = requiredInputs.length;
+        const pct = Math.round((filledCount / total) * 100);
+
+        progressBar.style.width = pct + '%';
+        progressText.textContent = `${filledCount} of ${total} core fields filled (${pct}%)`;
+    }
+
+    // Photo Upload Handlers
+    function handlePhotoFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+            alert('Please select a valid image file (JPG, PNG, WEBP).');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            
+            // Update dropzone preview
+            dropzoneThumb.src = dataUrl;
+            dropzoneContent.style.display = 'none';
+            dropzonePreview.classList.add('is-active');
+
+            // Update live card preview
+            cardPhotoPreview.src = dataUrl;
+            cardPhotoPreview.classList.add('is-visible');
+            cardPhotoSilhouette.style.display = 'none';
+
+            updateProgress();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Dropzone Click
+    photoDropzone.addEventListener('click', () => {
+        photoInput.click();
+    });
+
+    photoInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            handlePhotoFile(e.target.files[0]);
+        }
+    });
+
+    // Drag and Drop Events
+    ['dragenter', 'dragover'].forEach(eventName => {
+        photoDropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            photoDropzone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        photoDropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            photoDropzone.classList.remove('dragover');
+        });
+    });
+
+    photoDropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+            photoInput.files = files;
+            handlePhotoFile(files[0]);
+        }
+    });
+
+    // Input Listeners
+    [fullNameInput, rollNumberInput, deptInput, courseInput, validTillInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', updateLivePreview);
+            input.addEventListener('change', updateLivePreview);
+        }
+    });
+
+    // Form Submission with Gentle Shake Animation and Smooth Scroll
+    studentForm.addEventListener('submit', (e) => {
+        let firstInvalid = null;
+
+        // Check Full Name
+        if (!fullNameInput.value.trim()) {
+            const wrap = document.getElementById('field-fullName');
+            wrap.classList.add('shake-error');
+            setTimeout(() => wrap.classList.remove('shake-error'), 500);
+            if (!firstInvalid) firstInvalid = fullNameInput;
+        }
+
+        // Check Roll Number
+        if (!rollNumberInput.value.trim()) {
+            const wrap = document.getElementById('field-rollNumber');
+            wrap.classList.add('shake-error');
+            setTimeout(() => wrap.classList.remove('shake-error'), 500);
+            if (!firstInvalid) firstInvalid = rollNumberInput;
+        }
+
+        // Check Photo
+        if (!photoInput.files || photoInput.files.length === 0) {
+            const wrap = document.getElementById('field-photo');
+            wrap.classList.add('shake-error');
+            setTimeout(() => wrap.classList.remove('shake-error'), 500);
+            if (!firstInvalid) firstInvalid = photoDropzone;
+        }
+
+        if (firstInvalid) {
+            e.preventDefault();
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (firstInvalid.focus) firstInvalid.focus();
+            return false;
+        }
+
+        // Show loading state on submit
+        submitBtn.classList.add('is-loading');
+    });
+
+    // Initial trigger
+    updateLivePreview();
+});
+</script>
+</body>
+</html>
